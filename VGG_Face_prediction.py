@@ -16,7 +16,7 @@ K.set_image_data_format('channels_last')
 #Load in the trained model
 model = keras.models.load_model("./Other Files/VGG_Face_pretrained_model.h5")
 #Run Transfer_Learning.py to get the Transfer_Model.h5 file
-#model = keras.models.load_model("./Other Files/Transfer_Model.h5")
+model = keras.models.load_model("./Other Files/Transfer_Model.h5")
 
 #Loading in the matlab file containing the VGG model weights
 from scipy.io import loadmat

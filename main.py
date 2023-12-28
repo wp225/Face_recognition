@@ -1,16 +1,11 @@
-# This is a sample Python script.
+from Transfer_Learning import CustomModel
+from Trained_Model_Creation import TrainModel
 
-# Press ⌃R to execute it or replace it with your code.
-# Press Double ⇧ to search everywhere for classes, files, tool windows, actions, and settings.
+train_path = './Dataset/train'
+valid_path = './Dataset/validation'
 
+model=CustomModel(train_path,valid_path)
+full_model=model.top_model()
 
-def print_hi(name):
-    # Use a breakpoint in the code line below to debug your script.
-    print(f'Hi, {name}')  # Press ⌘F8 to toggle the breakpoint.
-
-
-# Press the green button in the gutter to run the script.
-if __name__ == '__main__':
-    print_hi('PyCharm')
-
-# See PyCharm help at https://www.jetbrains.com/help/pycharm/
+training=TrainModel(full_model,train_path,valid_path,epochs=10)
+ret=training.train()
