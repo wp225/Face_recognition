@@ -1,5 +1,5 @@
-from Transfer_Learning import CustomModel
-from Trained_Model_Creation import TrainModel
+from utils.Transfer_Learning import CustomModel
+from utils.Trained_Model_Creation import TrainModel
 
 train_path = './Dataset/train'
 valid_path = './Dataset/validation'

@@ -58,7 +58,7 @@ def prediction(kmodel, img):
 
 #Set image and cascade file paths
 imagePath = "./Test Images/Mark_Hamill.jpg"
-cascadePath = "./Other Files/haarcascade_frontalface_default.xml"
+cascadePath = "./Other Files/ .xml"
 
 #Create the haar cascade
 faceCascade = cv2.CascadeClassifier(cascadePath)
