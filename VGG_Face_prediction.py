@@ -4,26 +4,12 @@ import tensorflow as tf
 import keras
 from utils.class_mapping import class_mapping
 
-# TODO : Download and Integerate HARR CASCADE Classifier
-# Load the pre-trained face detection model
-face_cascade = cv2.CascadeClassifier('path/to/haarcascade_frontalface_default.xml')
+# Load the pre-trained model
+model = keras.models.load_model('/Users/anshujoshi/PycharmProjects/Face_recognition/Face_recognition.h5')
 
-# Load the pre-trained object detection model
-model = keras.models.load_model('/Users/anshujoshi/PycharmProjects/Face_recognition/face_recog.h5')
-
-# Function to preprocess and perform object and face detection
+# Function to preprocess and perform object detection
 def detect_objects(frame):
-    # Convert the frame to grayscale for face detection
-    gray_frame = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-
-    # Detect faces in the grayscale frame
-    faces = face_cascade.detectMultiScale(gray_frame, scaleFactor=1.3, minNeighbors=5)
-
-    # Draw rectangles around the detected faces
-    for (x, y, w, h) in faces:
-        cv2.rectangle(frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
-
-    # Resize the frame to 224x224 for object detection
+    # Resize the frame to 224x224
     resized_frame = cv2.resize(frame, (224, 224))
 
     # Normalize pixel values to be between 0 and 1
@@ -34,7 +20,7 @@ def detect_objects(frame):
 
     # Get model predictions
     predictions = model(input_tensor)
-
+    print(predictions.shape)
     # Get the class mapping based on the dataset path
     class_map = class_mapping('/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset/train')
 
@@ -58,11 +44,11 @@ while cap.isOpened():
     if not ret:
         break
 
-    # Perform object and face detection
+    # Perform object detection
     frame_with_detections = detect_objects(frame)
 
     # Display the frame
-    cv2.imshow('Object and Face Detection', frame_with_detections)
+    cv2.imshow('Object Detection', frame_with_detections)
 
     # Break the loop if 'q' is pressed
     if cv2.waitKey(1) & 0xFF == ord('q'):

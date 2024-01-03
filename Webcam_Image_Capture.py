@@ -3,19 +3,24 @@ import os
 import uuid
 import time
 
-face_path = './YOUR_NAME'  # TODO: insert your name
+face_path = './Dataset/train/Abindra'  # TODO: insert your name
 
 
 def capture():
     '''
     :return: saves frames from webcam when pressing key(c)
     '''
-    # TODO: TILT YOUR HEAD IN ALL DIRECTIONS DIRECTIONS AND PRESS C TO SAVE FRAME, TAKE ATLEAST 20 PICS
+    # TODO: TILT YOUR HEAD IN ALL DIRECTIONS DIRECTIONS AND PRESS C TO SAVE FRAME, TAKE AT LEAST 20 PICS
 
     cap = cv2.VideoCapture(0)
 
     while cap.isOpened():
         ret, frame = cap.read()
+
+        if not ret:
+            # If frame is not captured, break out of the loop
+            print("Failed to capture frame.")
+            break
 
         # Resize the frame to (244, 244)
         resized_frame = cv2.resize(frame, (244, 244))
