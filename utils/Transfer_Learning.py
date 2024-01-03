@@ -9,7 +9,6 @@ img_col = 224
 train_path = '../Dataset/train'
 valid_path = '../Dataset/validation'
 
-
 class CustomModel:
     def __init__(self, train_path, valid_path):
         self.train_path = train_path
