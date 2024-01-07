@@ -10,10 +10,9 @@ def capture():
     '''
     :return: saves frames from webcam when pressing key(c)
     '''
-    # TODO: TILT YOUR HEAD IN ALL DIRECTIONS DIRECTIONS AND PRESS C TO SAVE FRAME, TAKE AT LEAST 20 PICS
-
     cap = cv2.VideoCapture(0)
-
+    cap.set(3,244)
+    cap.set(4,244)
     while cap.isOpened():
         ret, frame = cap.read()
 
@@ -22,15 +21,12 @@ def capture():
             print("Failed to capture frame.")
             break
 
-        # Resize the frame to (244, 244)
-        resized_frame = cv2.resize(frame, (244, 244))
-
-        cv2.imshow('Image Collection', resized_frame)
+        cv2.imshow('Image Collection', frame)
         key = cv2.waitKey(1) & 0xFF
 
         if key == ord('c'):
             imgname = os.path.join(face_path, '{}.jpg'.format(uuid.uuid1()))
-            cv2.imwrite(imgname, resized_frame)
+            cv2.imwrite(imgname, frame)
             print(f"Resized image saved as {imgname}")
 
         # Breaking gracefully
