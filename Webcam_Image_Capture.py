@@ -11,8 +11,6 @@ def capture():
     :return: saves frames from webcam when pressing key(c)
     '''
     cap = cv2.VideoCapture(0)
-    cap.set(3,244)
-    cap.set(4,244)
     while cap.isOpened():
         ret, frame = cap.read()
 

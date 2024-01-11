@@ -2,22 +2,19 @@ import os
 from keras.applications import VGG16
 from keras.models import Model
 from keras.layers import Flatten, Dropout, Dense, BatchNormalization
+from keras_vggface import VGGFace
 
 img_row = 224
 img_col = 224
 
-train_path = '../Dataset/train'
-valid_path = '../Dataset/validation'
-
 class CustomModel:
-    def __init__(self, train_path, valid_path):
-        self.train_path = train_path
-        self.valid_path = valid_path
-        self.num_classes = len(os.listdir(self.train_path))
+    def __init__(self, data_path):
+        self.data_path = data_path
+        self.num_classes = len(os.listdir(self.data_path))
 
     def base_model(self):
-        input_shape=(img_row,img_col,3)
-        base_model = VGG16(weights='imagenet', include_top=False,input_shape=input_shape)
+        input_shape = (img_row, img_col, 3)
+        base_model = VGGFace(include_top=False,input_shape=input_shape,pooling='max')
 
         for layer in base_model.layers:
             layer.trainable = False
@@ -29,19 +26,18 @@ class CustomModel:
         base_model = self.base_model()
         top_model = base_model.output
         top_model = Flatten()(top_model)
-        top_model = Dense(512, activation='relu')(top_model)
-        top_model = BatchNormalization()(top_model)
-        top_model = Dropout(0.5)(top_model)
         top_model = Dense(256, activation='relu')(top_model)
         top_model = BatchNormalization()(top_model)
         top_model = Dropout(0.5)(top_model)
         top_model = Dense(self.num_classes, activation='softmax')(top_model)
 
-        New_model=Model(inputs=base_model.inputs,outputs=top_model)
+        New_model = Model(inputs=base_model.inputs, outputs=top_model)
         New_model.summary()
 
         return New_model
 
+
 if __name__ == '__main__':
-    Test_model = CustomModel(train_path, valid_path)
+    data_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset'
+    Test_model = CustomModel(data_path)
     top_mode = Test_model.top_model()

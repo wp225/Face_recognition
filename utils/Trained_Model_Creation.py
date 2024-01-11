@@ -1,57 +1,56 @@
+import os
 import tensorflow as tf
 from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
-from utils.Transfer_Learning import CustomModel  #CustomModel is defined in Transfer_Learning module
-
-img_row = 224
-img_col = 224
-train_path = '../Dataset/train'
-valid_path = '../Dataset/validation'
-
-
-import tensorflow as tf
-from keras.callbacks import EarlyStopping, ModelCheckpoint, TensorBoard
+from keras.preprocessing.image import ImageDataGenerator
+from datetime import datetime
 from utils.Transfer_Learning import CustomModel
 
+data_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset/'
+class_name = ['Abindra', 'Asmi','Bijen','Jeorge']
+
 class TrainModel:
-    def __init__(self, custom_model, train_path, valid_path, epochs):
+    def __init__(self, custom_model, data_path='/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset/', epochs=2):
         self.custom_model = custom_model
-        self.train_path = train_path
-        self.valid_path = valid_path
+        self.data_path = data_path
         self.train_batchsize = 16
         self.val_batchsize = 8
         self.epochs = epochs
 
-    def data_loader(self):
-        train_datagen = tf.keras.preprocessing.image.ImageDataGenerator(
-            rescale=1. / 225,
-            rotation_range=20,
-            width_shift_range=0.2,
-            height_shift_range=0.2,
-            horizontal_flip=True,
-            fill_mode='nearest'
+    def data_loader(self, subset):
+        AutoTune = tf.data.AUTOTUNE
+
+        # Apply data augmentation to the training data
+        if subset == 'training':
+            data_gen = ImageDataGenerator(
+                rescale=1. / 255,
+                rotation_range=20,
+                width_shift_range=0.2,
+                height_shift_range=0.2,
+                shear_range=0.2,
+                zoom_range=0.2,
+                horizontal_flip=True,
+                fill_mode='nearest',
+                validation_split=0.2,  # Moved outside the parentheses
+            )
+        else:
+            data_gen = ImageDataGenerator(rescale=1. / 255, validation_split=0.2)  # Moved outside the parentheses
+
+        data = data_gen.flow_from_directory(
+            self.data_path,
+            target_size=(224, 224),
+            batch_size=self.train_batchsize if subset == 'training' else self.val_batchsize,
+            class_mode='categorical',
+            shuffle=True,
+            seed=123,
+            subset=subset,
+            classes=class_name
         )
 
-        valid_datagen = tf.keras.preprocessing.image.ImageDataGenerator(rescale=1. / 225)
-
-        train_generator = train_datagen.flow_from_directory(self.train_path,
-                                                            target_size=(img_row, img_col),
-                                                            batch_size=self.train_batchsize,
-                                                            class_mode='categorical',
-                                                            shuffle=True)
-
-        valid_generator = valid_datagen.flow_from_directory(self.valid_path,
-                                                            target_size=(img_row, img_col),
-                                                            batch_size=self.val_batchsize,
-                                                            class_mode='categorical',
-                                                            shuffle=False
-                                                            )
-
-        return train_generator, valid_generator
+        return data
 
     def train(self):
-        # Get the class mapping based on the dataset path
-        train_generator, valid_generator = self.data_loader()
-        class_mapping = {v: k for k, v in train_generator.class_indices.items()}
+        train_generator = self.data_loader(subset='training')
+        valid_generator = self.data_loader(subset='validation')
 
         checkpoint = ModelCheckpoint("/Users/anshujoshi/PycharmProjects/Face_recognition/Face_recognition.h5",
                                      monitor="val_loss",
@@ -69,27 +68,23 @@ class TrainModel:
 
         callbacks = [earlystop, checkpoint, tensorboard]
 
-        # Ensure that the custom_model has a compile method
-        self.custom_model.compile(optimizer=tf.keras.optimizers.legacy.RMSprop(lr=0.001),
+        self.custom_model.compile(optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate=0.0001),
                                   loss='categorical_crossentropy',
                                   metrics=['accuracy'])
 
+        start_time = datetime.now()
         history = self.custom_model.fit(
             train_generator,
             epochs=self.epochs,
-            callbacks=callbacks,
             validation_data=valid_generator,
+            callbacks=callbacks
         )
-
+        end_time = datetime.now()
+        print('Training Time: {}'.format(end_time - start_time))
         return history
 
-# Rest of your code remains unchanged...
-
-
-
 if __name__ == '__main__':
-    custom_model_instance = CustomModel(train_path, valid_path)
-    full_model = custom_model_instance.top_model()
-
-    training_instance = TrainModel(custom_model_instance, train_path, valid_path, epochs=2)
-    training_result = training_instance.train()
+    model=CustomModel(data_path)
+    model=model.top_model()
+    test = TrainModel(model)
+    test.train()
