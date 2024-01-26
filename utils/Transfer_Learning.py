@@ -14,10 +14,10 @@ class CustomModel:
 
     def base_model(self):
         input_shape = (img_row, img_col, 3)
-        base_model = VGGFace(include_top=False,input_shape=input_shape,pooling='max')
+        base_model = VGGFace(include_top=False,input_shape=input_shape,pooling='max',model='vgg16')
 
-        for layer in base_model.layers:
-            layer.trainable = False
+        for layers in base_model.layers:
+            layers.trainable = False
 
         base_model.summary()
         return base_model
@@ -38,6 +38,6 @@ class CustomModel:
 
 
 if __name__ == '__main__':
-    data_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset'
+    data_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Test Images'
     Test_model = CustomModel(data_path)
     top_mode = Test_model.top_model()
