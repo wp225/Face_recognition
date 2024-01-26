@@ -2,3 +2,4 @@
 *.mat
 *.jpg
 *.t7
+/logs/
