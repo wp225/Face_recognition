@@ -1,36 +1,29 @@
 import cv2
 import os
+from mtcnn import MTCNN
 
-input_dir = '../Dataset'
-output_dir = '../DS'
 
 def Face_Capture(frame):
-    frame_gray = cv2.cvtColor(frame, cv2.COLOR_BGR2GRAY)
-    face_cascade = cv2.CascadeClassifier('../haarcascade_frontalface_default.xml')
+    detector = MTCNN()
+    faces = detector.detect_faces(frame)
+    count_faces = 0
+    print(faces)
+    for face in faces:
+        if face['confidence'] >= 0.6:
+            count_faces += 1
+            return face['box'], face['confidence']
 
-    # Detect faces
-    faces = face_cascade.detectMultiScale(frame_gray, scaleFactor=1.1, minNeighbors=5)
+    if count_faces == 0:
+        print('no face detected')
 
-    for (x, y, w, h) in faces:
-        face_roi = frame_gray[y-20:y + h+20, x:x + w]
-        return face_roi
+        # print(bbox)
+        # x, y, w, h = bbox
+        # face_roi = frame_gray[y-50:y + h+50, x:x-100 + w+150]  #TODO: Needs adjustment according to use case
+        # cv2.imshow('test',face_roi)
+        # cv2.waitKey(0)
+
 
 if __name__ == '__main__':
-    for class_folder in os.listdir(input_dir):
-        class_folder_path = os.path.join(input_dir, class_folder)
-        for file_name in os.listdir(class_folder_path):
-            image_path = os.path.join(class_folder_path, file_name)
-            frame = cv2.imread(image_path)
-            face_roi = Face_Capture(frame)
-            if face_roi is not None:
-                # Create a new file path for saving the face ROI
-                save_path = os.path.join(output_dir, class_folder, file_name)
-
-                # Ensure the output directory exists
-                os.makedirs(os.path.dirname(save_path), exist_ok=True)
-
-                # Save the face ROI
-                cv2.imwrite(save_path, face_roi)
-            else:
-                cv2.imshow('no frame',frame)
-                cv2.waitKey(0)
+    image_path = '/Users/anshujoshi/Desktop/Screenshot 2023-11-05 at 5.35.52 PM.png'
+    frame = cv2.imread(image_path)
+    face, conf = Face_Capture(frame)
