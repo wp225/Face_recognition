@@ -2,4 +2,7 @@
 *.mat
 *.jpg
 *.t7
-/logs/
+/logs
+/Dataset
+/Other Files
+/Test Images

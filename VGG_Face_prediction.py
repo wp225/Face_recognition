@@ -37,6 +37,6 @@ class Inference:
         print(f"Probabilities: {predictions[0]}")
 
 if __name__ == '__main__':
-    inference_image_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset/Bijen/0a09309e-a9f7-11ee-b07c-8eb309e49124.jpg'  # Replace with the path to your inference image
+    inference_image_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Dataset/1.jpg'  # Replace with the path to your inference image
     inference = Inference(model_path='/Users/anshujoshi/PycharmProjects/Face_recognition/utils/Face_recognition.h5', class_labels_path='/Users/anshujoshi/PycharmProjects/Face_recognition/utils/class_labels.txt', image_path=inference_image_path)
     inference.infer()
