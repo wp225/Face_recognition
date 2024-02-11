@@ -9,12 +9,10 @@ def Face_Capture(frame):
     count_faces = 0
     print(faces)
     for face in faces:
+        print(face['confidence'])
         if face['confidence'] >= 0.6:
             count_faces += 1
-            return face['box'], face['confidence']
-
-    if count_faces == 0:
-        print('no face detected')
+            return face['box'], face['confidence'],count_faces
 
         # print(bbox)
         # x, y, w, h = bbox
@@ -24,6 +22,6 @@ def Face_Capture(frame):
 
 
 if __name__ == '__main__':
-    image_path = '/Users/anshujoshi/Desktop/Screenshot 2023-11-05 at 5.35.52 PM.png'
+    image_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/utils/dataset/jj/image_19.png'
     frame = cv2.imread(image_path)
-    face, conf = Face_Capture(frame)
+    print(Face_Capture(frame))

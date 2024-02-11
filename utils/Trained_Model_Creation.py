@@ -7,8 +7,7 @@ from utils.Transfer_Learning import CustomModel
 
 
 class TrainModel:
-    def __init__(self, custom_model, data_path='/Users/anshujoshi/PycharmProjects/Face_recognition/Test Images',
-                 epochs=10):
+    def __init__(self, custom_model, data_path,epochs=10):
         self.custom_model = custom_model
         self.data_path = data_path
         self.train_batchsize = 16
@@ -87,7 +86,7 @@ class TrainModel:
 
 
 if __name__ == '__main__':
-    data_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Test Images'
+    data_path = '../Test Images'
     model = CustomModel(data_path)
     model = model.top_model()
     trainer = TrainModel(model)

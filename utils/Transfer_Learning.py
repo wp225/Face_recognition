@@ -38,6 +38,6 @@ class CustomModel:
 
 
 if __name__ == '__main__':
-    data_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/Test Images'
+    data_path = '../Test Images'
     Test_model = CustomModel(data_path)
     top_mode = Test_model.top_model()
