@@ -64,7 +64,7 @@ class TrainModel:
 
         callbacks = [earlystop, checkpoint, tensorboard]
 
-        self.custom_model.compile(optimizer=tf.keras.optimizers.RMSprop(learning_rate=0.001),
+        self.custom_model.compile(optimizer=tf.keras.optimizers.legacy.RMSprop(learning_rate=0.001),
                                   loss='categorical_crossentropy',
                                   metrics=['accuracy'])
 
@@ -86,8 +86,8 @@ class TrainModel:
 
 
 if __name__ == '__main__':
-    data_path = '../Test Images'
+    data_path = '../faces'
     model = CustomModel(data_path)
     model = model.top_model()
-    trainer = TrainModel(model)
+    trainer = TrainModel(model,data_path)
     trainer.train()

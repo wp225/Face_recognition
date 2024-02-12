@@ -1,27 +1,28 @@
 import cv2
-import os
 from mtcnn import MTCNN
 
+class FaceCapture:
+    def __init__(self):
+        self.detector = MTCNN()
 
-def Face_Capture(frame):
-    detector = MTCNN()
-    faces = detector.detect_faces(frame)
-    count_faces = 0
-    print(faces)
-    for face in faces:
-        print(face['confidence'])
-        if face['confidence'] >= 0.6:
-            count_faces += 1
-            return face['box'], face['confidence'],count_faces
+    def face_capture(self, frame):
+        faces = self.detector.detect_faces(frame)
+        count_faces = 0
 
-        # print(bbox)
-        # x, y, w, h = bbox
-        # face_roi = frame_gray[y-50:y + h+50, x:x-100 + w+150]  #TODO: Needs adjustment according to use case
-        # cv2.imshow('test',face_roi)
-        # cv2.waitKey(0)
+        for face in faces:
+            confidence = face['confidence']
+            if confidence >= .5:
+                count_faces += 1
+                box = face['box']
+                return box, confidence, count_faces
 
+        return None, None, count_faces
 
 if __name__ == '__main__':
     image_path = '/Users/anshujoshi/PycharmProjects/Face_recognition/utils/dataset/jj/image_19.png'
     frame = cv2.imread(image_path)
-    print(Face_Capture(frame))
+
+    face_capture_instance = FaceCapture()
+    result = face_capture_instance.face_capture(frame)
+
+    print(result)
