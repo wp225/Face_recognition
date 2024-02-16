@@ -54,10 +54,6 @@ class FaceCapture:
         model = load_model(model_path)
         cap = cv2.VideoCapture(0)
 
-        cursor.execute("SELECT DISTINCT id FROM public.attendance_log")
-        ids = cursor.fetchall()
-        existing_id = set(id[0] for id in ids)
-
         while True:
             ret, frame = cap.read()
             if not ret:
@@ -78,30 +74,50 @@ class FaceCapture:
                         predicted_class_index = np.argmax(predictions)
                         predicted_class_label = labels[predicted_class_index]
                         prediction_confidence = predictions[0][predicted_class_index]
+                        student_name = predicted_class_label
+                        today_date = datetime.now().date()
 
                         if prediction_confidence > .5:
                             cv2.rectangle(frame, (box[0], box[1]), (box[0] + box[2], box[1] + box[3]), (0, 255, 0), 2)
                             cv2.putText(frame, f"{predicted_class_label} - Confidence: {prediction_confidence:.2f}",
                                         (box[0], box[1] - 10), cv2.FONT_HERSHEY_SIMPLEX, 0.9, (36, 255, 12), 2)
 
-                            if int(predicted_class_index) in existing_id:
-                                # Username already exists, update the exit time
-                                cursor.execute(
-                                    "UPDATE public.attendance_log SET exittime = %s WHERE id = %s",
-                                    (datetime.now(), int(predicted_class_index))
-                                )
-                            else:
-                                try:
-                                    # Username doesn't exist, insert a new record
-                                    cursor.execute(
-                                        "INSERT INTO public.attendance_log (id,username, entrytime, exittime) VALUES (%s,%s, %s, %s)",
-                                        (int(predicted_class_index),predicted_class_label, datetime.now(), datetime.now())
-                                    )
-                                    existing_id.add(predicted_class_index)
-                                except psycopg2.errors.UniqueViolation:
-                                    # Handle UniqueViolation exception (username already exists)
-                                    pass
+                            cursor.execute(
+                                "SELECT entrytime, exittime FROM public.attendance_log WHERE username = %s AND date = %s",
+                                (student_name, today_date))
+                            existing_entry = cursor.fetchone()
 
+                            if existing_entry:
+                                entry_time, exit_time = existing_entry
+
+                                if not entry_time:
+                                    # Entry time doesn't exist, update entry time
+                                    cursor.execute(
+                                        "UPDATE public.attendance_log SET entrytime = %s WHERE username = %s AND date = %s",
+                                        (datetime.now(), student_name, today_date))
+                                    print(f"Entry time updated for {student_name} on {today_date}")
+                                elif entry_time and not exit_time:
+                                    # Entry time exists, but exit time is null, update exit time
+                                    cursor.execute(
+                                        "UPDATE public.attendance_log SET exittime = %s WHERE username = %s AND date = %s",
+                                        (datetime.now(), student_name, today_date))
+                                    print(f"Exit time updated for {student_name} on {today_date}")
+
+                                elif entry_time and exit_time:
+                                    cursor.execute(
+                                        "UPDATE public.attendance_log SET exittime = %s WHERE username = %s AND date = %s",
+                                        (datetime.now(), student_name, today_date))
+                                    print(f"Exit time updated for {student_name} on {today_date}")
+
+
+                            else:
+                                # No entry for the given name and today's date, insert a new row
+                                cursor.execute(
+                                    "INSERT INTO public.attendance_log (username, date, entrytime) VALUES (%s, %s, %s)",
+                                    (student_name, today_date, datetime.now()))
+                                print(f"New entry created for {student_name} on {today_date}")
+
+                            # Commit the changes
                             conn.commit()
 
                     except cv2.error as e:

@@ -48,7 +48,7 @@ class TrainModel:
         # Get the class labels from the generator
         class_labels = list(train_generator.class_indices.keys())
 
-        checkpoint = ModelCheckpoint("Face_recognition.h5",
+        checkpoint = ModelCheckpoint("../Face_recognition.h5",
                                      monitor="val_loss",
                                      mode="min",
                                      save_best_only=True,
@@ -79,7 +79,7 @@ class TrainModel:
         print('Training Time: {}'.format(end_time - start_time))
 
         # Save the class labels to a file for later use during inference
-        with open('class_labels.txt', 'w') as f:
+        with open('../class_labels.txt', 'w') as f:
             f.write("\n".join(class_labels))
 
         return history
